@@ -1,0 +1,1224 @@
+{
+  "countries": {
+    "AD": {
+      "country_code": "AD",
+      "discount_fraction": 0.342087071892876,
+      "price_level_ratio": 0.657912928107124,
+      "source_year": 2024
+    },
+    "AE": {
+      "country_code": "AE",
+      "discount_fraction": 0.365463759645585,
+      "price_level_ratio": 0.634536240354415,
+      "source_year": 2024
+    },
+    "AF": {
+      "country_code": "AF",
+      "discount_fraction": 0.8,
+      "price_level_ratio": 0.187924599142549,
+      "source_year": 2023
+    },
+    "AG": {
+      "country_code": "AG",
+      "discount_fraction": 0.294844620282363,
+      "price_level_ratio": 0.705155379717637,
+      "source_year": 2024
+    },
+    "AL": {
+      "country_code": "AL",
+      "discount_fraction": 0.573892807784617,
+      "price_level_ratio": 0.426107192215383,
+      "source_year": 2024
+    },
+    "AM": {
+      "country_code": "AM",
+      "discount_fraction": 0.6251085848936391,
+      "price_level_ratio": 0.374891415106361,
+      "source_year": 2024
+    },
+    "AO": {
+      "country_code": "AO",
+      "discount_fraction": 0.736537457944484,
+      "price_level_ratio": 0.263462542055516,
+      "source_year": 2024
+    },
+    "AR": {
+      "country_code": "AR",
+      "discount_fraction": 0.540938680774075,
+      "price_level_ratio": 0.459061319225925,
+      "source_year": 2024
+    },
+    "AT": {
+      "country_code": "AT",
+      "discount_fraction": 0.23102171359609402,
+      "price_level_ratio": 0.768978286403906,
+      "source_year": 2024
+    },
+    "AU": {
+      "country_code": "AU",
+      "discount_fraction": 0.10410588715038505,
+      "price_level_ratio": 0.895894112849615,
+      "source_year": 2024
+    },
+    "AW": {
+      "country_code": "AW",
+      "discount_fraction": 0.22015520566911195,
+      "price_level_ratio": 0.779844794330888,
+      "source_year": 2024
+    },
+    "AZ": {
+      "country_code": "AZ",
+      "discount_fraction": 0.709679537292794,
+      "price_level_ratio": 0.290320462707206,
+      "source_year": 2024
+    },
+    "BA": {
+      "country_code": "BA",
+      "discount_fraction": 0.6262925941687649,
+      "price_level_ratio": 0.373707405831235,
+      "source_year": 2024
+    },
+    "BB": {
+      "country_code": "BB",
+      "discount_fraction": 0.0,
+      "price_level_ratio": 1.06938600121587,
+      "source_year": 2024
+    },
+    "BD": {
+      "country_code": "BD",
+      "discount_fraction": 0.7311622274822089,
+      "price_level_ratio": 0.268837772517791,
+      "source_year": 2024
+    },
+    "BE": {
+      "country_code": "BE",
+      "discount_fraction": 0.23769242442500005,
+      "price_level_ratio": 0.762307575575,
+      "source_year": 2024
+    },
+    "BF": {
+      "country_code": "BF",
+      "discount_fraction": 0.660901438167503,
+      "price_level_ratio": 0.339098561832497,
+      "source_year": 2024
+    },
+    "BG": {
+      "country_code": "BG",
+      "discount_fraction": 0.580742261160894,
+      "price_level_ratio": 0.419257738839106,
+      "source_year": 2024
+    },
+    "BH": {
+      "country_code": "BH",
+      "discount_fraction": 0.557020949598258,
+      "price_level_ratio": 0.442979050401742,
+      "source_year": 2024
+    },
+    "BI": {
+      "country_code": "BI",
+      "discount_fraction": 0.8,
+      "price_level_ratio": 0.183627278106685,
+      "source_year": 2024
+    },
+    "BJ": {
+      "country_code": "BJ",
+      "discount_fraction": 0.6650448351413589,
+      "price_level_ratio": 0.334955164858641,
+      "source_year": 2024
+    },
+    "BM": {
+      "country_code": "BM",
+      "discount_fraction": 0.0,
+      "price_level_ratio": 1.14971520694886,
+      "source_year": 2024
+    },
+    "BN": {
+      "country_code": "BN",
+      "discount_fraction": 0.631133629136192,
+      "price_level_ratio": 0.368866370863808,
+      "source_year": 2024
+    },
+    "BO": {
+      "country_code": "BO",
+      "discount_fraction": 0.656678725694744,
+      "price_level_ratio": 0.343321274305256,
+      "source_year": 2024
+    },
+    "BR": {
+      "country_code": "BR",
+      "discount_fraction": 0.538439926812046,
+      "price_level_ratio": 0.461560073187954,
+      "source_year": 2024
+    },
+    "BS": {
+      "country_code": "BS",
+      "discount_fraction": 0.04229550902271495,
+      "price_level_ratio": 0.957704490977285,
+      "source_year": 2024
+    },
+    "BT": {
+      "country_code": "BT",
+      "discount_fraction": 0.763719430245389,
+      "price_level_ratio": 0.236280569754611,
+      "source_year": 2023
+    },
+    "BW": {
+      "country_code": "BW",
+      "discount_fraction": 0.625294394458631,
+      "price_level_ratio": 0.374705605541369,
+      "source_year": 2024
+    },
+    "BY": {
+      "country_code": "BY",
+      "discount_fraction": 0.748029365125847,
+      "price_level_ratio": 0.251970634874153,
+      "source_year": 2024
+    },
+    "BZ": {
+      "country_code": "BZ",
+      "discount_fraction": 0.46459178632462494,
+      "price_level_ratio": 0.535408213675375,
+      "source_year": 2024
+    },
+    "CA": {
+      "country_code": "CA",
+      "discount_fraction": 0.15984679225224097,
+      "price_level_ratio": 0.840153207747759,
+      "source_year": 2024
+    },
+    "CD": {
+      "country_code": "CD",
+      "discount_fraction": 0.643401440539118,
+      "price_level_ratio": 0.356598559460882,
+      "source_year": 2024
+    },
+    "CF": {
+      "country_code": "CF",
+      "discount_fraction": 0.591354569794586,
+      "price_level_ratio": 0.408645430205414,
+      "source_year": 2024
+    },
+    "CG": {
+      "country_code": "CG",
+      "discount_fraction": 0.6467234519659619,
+      "price_level_ratio": 0.353276548034038,
+      "source_year": 2024
+    },
+    "CH": {
+      "country_code": "CH",
+      "discount_fraction": 0.0,
+      "price_level_ratio": 1.07772716129893,
+      "source_year": 2024
+    },
+    "CI": {
+      "country_code": "CI",
+      "discount_fraction": 0.644306817513316,
+      "price_level_ratio": 0.355693182486684,
+      "source_year": 2024
+    },
+    "CL": {
+      "country_code": "CL",
+      "discount_fraction": 0.538160441521374,
+      "price_level_ratio": 0.461839558478626,
+      "source_year": 2024
+    },
+    "CM": {
+      "country_code": "CM",
+      "discount_fraction": 0.672568836872918,
+      "price_level_ratio": 0.327431163127082,
+      "source_year": 2024
+    },
+    "CN": {
+      "country_code": "CN",
+      "discount_fraction": 0.509197128671852,
+      "price_level_ratio": 0.490802871328148,
+      "source_year": 2024
+    },
+    "CO": {
+      "country_code": "CO",
+      "discount_fraction": 0.645664046631779,
+      "price_level_ratio": 0.354335953368221,
+      "source_year": 2024
+    },
+    "CR": {
+      "country_code": "CR",
+      "discount_fraction": 0.40247230448580995,
+      "price_level_ratio": 0.59752769551419,
+      "source_year": 2024
+    },
+    "CV": {
+      "country_code": "CV",
+      "discount_fraction": 0.536183504345053,
+      "price_level_ratio": 0.463816495654947,
+      "source_year": 2024
+    },
+    "CW": {
+      "country_code": "CW",
+      "discount_fraction": 0.30160309290686604,
+      "price_level_ratio": 0.698396907093134,
+      "source_year": 2024
+    },
+    "CY": {
+      "country_code": "CY",
+      "discount_fraction": 0.386186779722976,
+      "price_level_ratio": 0.613813220277024,
+      "source_year": 2024
+    },
+    "CZ": {
+      "country_code": "CZ",
+      "discount_fraction": 0.44767545100178696,
+      "price_level_ratio": 0.552324548998213,
+      "source_year": 2024
+    },
+    "DE": {
+      "country_code": "DE",
+      "discount_fraction": 0.24140065991093795,
+      "price_level_ratio": 0.758599340089062,
+      "source_year": 2024
+    },
+    "DJ": {
+      "country_code": "DJ",
+      "discount_fraction": 0.545122076752885,
+      "price_level_ratio": 0.454877923247115,
+      "source_year": 2024
+    },
+    "DK": {
+      "country_code": "DK",
+      "discount_fraction": 0.12245597103586803,
+      "price_level_ratio": 0.877544028964132,
+      "source_year": 2024
+    },
+    "DM": {
+      "country_code": "DM",
+      "discount_fraction": 0.511504966091189,
+      "price_level_ratio": 0.488495033908811,
+      "source_year": 2024
+    },
+    "DO": {
+      "country_code": "DO",
+      "discount_fraction": 0.605119631644642,
+      "price_level_ratio": 0.394880368355358,
+      "source_year": 2024
+    },
+    "DZ": {
+      "country_code": "DZ",
+      "discount_fraction": 0.6735103074915221,
+      "price_level_ratio": 0.326489692508478,
+      "source_year": 2024
+    },
+    "EC": {
+      "country_code": "EC",
+      "discount_fraction": 0.565998110894179,
+      "price_level_ratio": 0.434001889105821,
+      "source_year": 2024
+    },
+    "EE": {
+      "country_code": "EE",
+      "discount_fraction": 0.376369174842188,
+      "price_level_ratio": 0.623630825157812,
+      "source_year": 2024
+    },
+    "EG": {
+      "country_code": "EG",
+      "discount_fraction": 0.8,
+      "price_level_ratio": 0.174842797290911,
+      "source_year": 2024
+    },
+    "ER": {
+      "country_code": "ER",
+      "discount_fraction": 0.6724060400208429,
+      "price_level_ratio": 0.327593959979157,
+      "source_year": 2021
+    },
+    "ES": {
+      "country_code": "ES",
+      "discount_fraction": 0.39158636185234397,
+      "price_level_ratio": 0.608413638147656,
+      "source_year": 2024
+    },
+    "ET": {
+      "country_code": "ET",
+      "discount_fraction": 0.655096349130442,
+      "price_level_ratio": 0.344903650869558,
+      "source_year": 2024
+    },
+    "FI": {
+      "country_code": "FI",
+      "discount_fraction": 0.18394465748828104,
+      "price_level_ratio": 0.816055342511719,
+      "source_year": 2024
+    },
+    "FJ": {
+      "country_code": "FJ",
+      "discount_fraction": 0.584102457735579,
+      "price_level_ratio": 0.415897542264421,
+      "source_year": 2024
+    },
+    "FM": {
+      "country_code": "FM",
+      "discount_fraction": 0.04160208918763697,
+      "price_level_ratio": 0.958397910812363,
+      "source_year": 2024
+    },
+    "FO": {
+      "country_code": "FO",
+      "discount_fraction": 0.09509502639801903,
+      "price_level_ratio": 0.904904973601981,
+      "source_year": 2024
+    },
+    "FR": {
+      "country_code": "FR",
+      "discount_fraction": 0.26264021184921904,
+      "price_level_ratio": 0.737359788150781,
+      "source_year": 2024
+    },
+    "GA": {
+      "country_code": "GA",
+      "discount_fraction": 0.617388326255767,
+      "price_level_ratio": 0.382611673744233,
+      "source_year": 2024
+    },
+    "GB": {
+      "country_code": "GB",
+      "discount_fraction": 0.15114951057940296,
+      "price_level_ratio": 0.848850489420597,
+      "source_year": 2024
+    },
+    "GD": {
+      "country_code": "GD",
+      "discount_fraction": 0.41990282434383297,
+      "price_level_ratio": 0.580097175656167,
+      "source_year": 2024
+    },
+    "GE": {
+      "country_code": "GE",
+      "discount_fraction": 0.67327320910375,
+      "price_level_ratio": 0.32672679089625,
+      "source_year": 2024
+    },
+    "GH": {
+      "country_code": "GH",
+      "discount_fraction": 0.701898595547644,
+      "price_level_ratio": 0.298101404452356,
+      "source_year": 2024
+    },
+    "GL": {
+      "country_code": "GL",
+      "discount_fraction": 0.25800954837535495,
+      "price_level_ratio": 0.741990451624645,
+      "source_year": 2023
+    },
+    "GM": {
+      "country_code": "GM",
+      "discount_fraction": 0.7492987775383231,
+      "price_level_ratio": 0.250701222461677,
+      "source_year": 2024
+    },
+    "GN": {
+      "country_code": "GN",
+      "discount_fraction": 0.628731197128739,
+      "price_level_ratio": 0.371268802871261,
+      "source_year": 2024
+    },
+    "GQ": {
+      "country_code": "GQ",
+      "discount_fraction": 0.616013418436801,
+      "price_level_ratio": 0.383986581563199,
+      "source_year": 2024
+    },
+    "GR": {
+      "country_code": "GR",
+      "discount_fraction": 0.442480973873438,
+      "price_level_ratio": 0.557519026126562,
+      "source_year": 2024
+    },
+    "GT": {
+      "country_code": "GT",
+      "discount_fraction": 0.571983367189847,
+      "price_level_ratio": 0.428016632810153,
+      "source_year": 2024
+    },
+    "GW": {
+      "country_code": "GW",
+      "discount_fraction": 0.6769408534658701,
+      "price_level_ratio": 0.32305914653413,
+      "source_year": 2024
+    },
+    "GY": {
+      "country_code": "GY",
+      "discount_fraction": 0.6297769346488731,
+      "price_level_ratio": 0.370223065351127,
+      "source_year": 2024
+    },
+    "HK": {
+      "country_code": "HK",
+      "discount_fraction": 0.280883258547989,
+      "price_level_ratio": 0.719116741452011,
+      "source_year": 2024
+    },
+    "HN": {
+      "country_code": "HN",
+      "discount_fraction": 0.542288768922685,
+      "price_level_ratio": 0.457711231077315,
+      "source_year": 2024
+    },
+    "HR": {
+      "country_code": "HR",
+      "discount_fraction": 0.5146305689681809,
+      "price_level_ratio": 0.485369431031819,
+      "source_year": 2024
+    },
+    "HT": {
+      "country_code": "HT",
+      "discount_fraction": 0.32910338575015796,
+      "price_level_ratio": 0.670896614249842,
+      "source_year": 2024
+    },
+    "HU": {
+      "country_code": "HU",
+      "discount_fraction": 0.519872873488306,
+      "price_level_ratio": 0.480127126511694,
+      "source_year": 2024
+    },
+    "ID": {
+      "country_code": "ID",
+      "discount_fraction": 0.700550341454231,
+      "price_level_ratio": 0.299449658545769,
+      "source_year": 2024
+    },
+    "IE": {
+      "country_code": "IE",
+      "discount_fraction": 0.198070804985938,
+      "price_level_ratio": 0.801929195014062,
+      "source_year": 2024
+    },
+    "IL": {
+      "country_code": "IL",
+      "discount_fraction": 0.053447198282841946,
+      "price_level_ratio": 0.946552801717158,
+      "source_year": 2024
+    },
+    "IN": {
+      "country_code": "IN",
+      "discount_fraction": 0.758535728119244,
+      "price_level_ratio": 0.241464271880756,
+      "source_year": 2024
+    },
+    "IQ": {
+      "country_code": "IQ",
+      "discount_fraction": 0.580097033782647,
+      "price_level_ratio": 0.419902966217353,
+      "source_year": 2024
+    },
+    "IR": {
+      "country_code": "IR",
+      "discount_fraction": 0.738844754973907,
+      "price_level_ratio": 0.261155245026093,
+      "source_year": 2024
+    },
+    "IS": {
+      "country_code": "IS",
+      "discount_fraction": 0.0,
+      "price_level_ratio": 1.02754522612876,
+      "source_year": 2024
+    },
+    "IT": {
+      "country_code": "IT",
+      "discount_fraction": 0.35097544666484404,
+      "price_level_ratio": 0.649024553335156,
+      "source_year": 2024
+    },
+    "JM": {
+      "country_code": "JM",
+      "discount_fraction": 0.39847628493880605,
+      "price_level_ratio": 0.601523715061194,
+      "source_year": 2024
+    },
+    "JO": {
+      "country_code": "JO",
+      "discount_fraction": 0.57324772205597,
+      "price_level_ratio": 0.42675227794403,
+      "source_year": 2024
+    },
+    "JP": {
+      "country_code": "JP",
+      "discount_fraction": 0.375933715578307,
+      "price_level_ratio": 0.624066284421693,
+      "source_year": 2024
+    },
+    "KE": {
+      "country_code": "KE",
+      "discount_fraction": 0.6790498949132411,
+      "price_level_ratio": 0.320950105086759,
+      "source_year": 2024
+    },
+    "KG": {
+      "country_code": "KG",
+      "discount_fraction": 0.69794706737926,
+      "price_level_ratio": 0.30205293262074,
+      "source_year": 2024
+    },
+    "KH": {
+      "country_code": "KH",
+      "discount_fraction": 0.670149188442474,
+      "price_level_ratio": 0.329850811557526,
+      "source_year": 2024
+    },
+    "KI": {
+      "country_code": "KI",
+      "discount_fraction": 0.381838674665568,
+      "price_level_ratio": 0.618161325334432,
+      "source_year": 2024
+    },
+    "KM": {
+      "country_code": "KM",
+      "discount_fraction": 0.5799562786922621,
+      "price_level_ratio": 0.420043721307738,
+      "source_year": 2024
+    },
+    "KN": {
+      "country_code": "KN",
+      "discount_fraction": 0.31239630249371897,
+      "price_level_ratio": 0.687603697506281,
+      "source_year": 2024
+    },
+    "KR": {
+      "country_code": "KR",
+      "discount_fraction": 0.406423603190612,
+      "price_level_ratio": 0.593576396809388,
+      "source_year": 2024
+    },
+    "KW": {
+      "country_code": "KW",
+      "discount_fraction": 0.37613511308995995,
+      "price_level_ratio": 0.62386488691004,
+      "source_year": 2024
+    },
+    "KY": {
+      "country_code": "KY",
+      "discount_fraction": 0.0,
+      "price_level_ratio": 1.12118058990755,
+      "source_year": 2023
+    },
+    "KZ": {
+      "country_code": "KZ",
+      "discount_fraction": 0.65384421720647,
+      "price_level_ratio": 0.34615578279353,
+      "source_year": 2024
+    },
+    "LA": {
+      "country_code": "LA",
+      "discount_fraction": 0.782731543927777,
+      "price_level_ratio": 0.217268456072223,
+      "source_year": 2024
+    },
+    "LB": {
+      "country_code": "LB",
+      "discount_fraction": 0.723437685187247,
+      "price_level_ratio": 0.276562314812753,
+      "source_year": 2023
+    },
+    "LC": {
+      "country_code": "LC",
+      "discount_fraction": 0.48556384227582605,
+      "price_level_ratio": 0.514436157724174,
+      "source_year": 2024
+    },
+    "LK": {
+      "country_code": "LK",
+      "discount_fraction": 0.711144016735257,
+      "price_level_ratio": 0.288855983264743,
+      "source_year": 2024
+    },
+    "LR": {
+      "country_code": "LR",
+      "discount_fraction": 0.5449077115144669,
+      "price_level_ratio": 0.455092288485533,
+      "source_year": 2024
+    },
+    "LS": {
+      "country_code": "LS",
+      "discount_fraction": 0.676156316886271,
+      "price_level_ratio": 0.323843683113729,
+      "source_year": 2024
+    },
+    "LT": {
+      "country_code": "LT",
+      "discount_fraction": 0.468507894625,
+      "price_level_ratio": 0.531492105375,
+      "source_year": 2024
+    },
+    "LU": {
+      "country_code": "LU",
+      "discount_fraction": 0.11723321967734401,
+      "price_level_ratio": 0.882766780322656,
+      "source_year": 2024
+    },
+    "LV": {
+      "country_code": "LV",
+      "discount_fraction": 0.4625677906125,
+      "price_level_ratio": 0.5374322093875,
+      "source_year": 2024
+    },
+    "LY": {
+      "country_code": "LY",
+      "discount_fraction": 0.5407402188663499,
+      "price_level_ratio": 0.45925978113365,
+      "source_year": 2024
+    },
+    "MA": {
+      "country_code": "MA",
+      "discount_fraction": 0.601234292134118,
+      "price_level_ratio": 0.398765707865882,
+      "source_year": 2024
+    },
+    "MD": {
+      "country_code": "MD",
+      "discount_fraction": 0.593005600325841,
+      "price_level_ratio": 0.406994399674159,
+      "source_year": 2024
+    },
+    "ME": {
+      "country_code": "ME",
+      "discount_fraction": 0.610620836445778,
+      "price_level_ratio": 0.389379163554222,
+      "source_year": 2024
+    },
+    "MG": {
+      "country_code": "MG",
+      "discount_fraction": 0.710657461862068,
+      "price_level_ratio": 0.289342538137932,
+      "source_year": 2024
+    },
+    "MH": {
+      "country_code": "MH",
+      "discount_fraction": 0.057147347755092004,
+      "price_level_ratio": 0.942852652244908,
+      "source_year": 2024
+    },
+    "MK": {
+      "country_code": "MK",
+      "discount_fraction": 0.655798893639261,
+      "price_level_ratio": 0.344201106360739,
+      "source_year": 2024
+    },
+    "ML": {
+      "country_code": "ML",
+      "discount_fraction": 0.6697754608776649,
+      "price_level_ratio": 0.330224539122335,
+      "source_year": 2024
+    },
+    "MM": {
+      "country_code": "MM",
+      "discount_fraction": 0.7733959300119531,
+      "price_level_ratio": 0.226604069988047,
+      "source_year": 2024
+    },
+    "MN": {
+      "country_code": "MN",
+      "discount_fraction": 0.647389569977771,
+      "price_level_ratio": 0.352610430022229,
+      "source_year": 2024
+    },
+    "MO": {
+      "country_code": "MO",
+      "discount_fraction": 0.43285451562406396,
+      "price_level_ratio": 0.567145484375936,
+      "source_year": 2024
+    },
+    "MR": {
+      "country_code": "MR",
+      "discount_fraction": 0.713639412239634,
+      "price_level_ratio": 0.286360587760366,
+      "source_year": 2024
+    },
+    "MT": {
+      "country_code": "MT",
+      "discount_fraction": 0.37165438998462796,
+      "price_level_ratio": 0.628345610015372,
+      "source_year": 2024
+    },
+    "MU": {
+      "country_code": "MU",
+      "discount_fraction": 0.623402312476748,
+      "price_level_ratio": 0.376597687523252,
+      "source_year": 2024
+    },
+    "MV": {
+      "country_code": "MV",
+      "discount_fraction": 0.48900194156408705,
+      "price_level_ratio": 0.510998058435913,
+      "source_year": 2024
+    },
+    "MW": {
+      "country_code": "MW",
+      "discount_fraction": 0.7186878493067079,
+      "price_level_ratio": 0.281312150693292,
+      "source_year": 2024
+    },
+    "MX": {
+      "country_code": "MX",
+      "discount_fraction": 0.45825518012759203,
+      "price_level_ratio": 0.541744819872408,
+      "source_year": 2024
+    },
+    "MY": {
+      "country_code": "MY",
+      "discount_fraction": 0.693794561521873,
+      "price_level_ratio": 0.306205438478127,
+      "source_year": 2024
+    },
+    "MZ": {
+      "country_code": "MZ",
+      "discount_fraction": 0.6148793028059201,
+      "price_level_ratio": 0.38512069719408,
+      "source_year": 2024
+    },
+    "NE": {
+      "country_code": "NE",
+      "discount_fraction": 0.641319869013834,
+      "price_level_ratio": 0.358680130986166,
+      "source_year": 2024
+    },
+    "NG": {
+      "country_code": "NG",
+      "discount_fraction": 0.8,
+      "price_level_ratio": 0.119310583415279,
+      "source_year": 2024
+    },
+    "NI": {
+      "country_code": "NI",
+      "discount_fraction": 0.6730273150363391,
+      "price_level_ratio": 0.326972684963661,
+      "source_year": 2024
+    },
+    "NL": {
+      "country_code": "NL",
+      "discount_fraction": 0.208324195166406,
+      "price_level_ratio": 0.791675804833594,
+      "source_year": 2024
+    },
+    "NO": {
+      "country_code": "NO",
+      "discount_fraction": 0.149238340442029,
+      "price_level_ratio": 0.850761659557971,
+      "source_year": 2024
+    },
+    "NP": {
+      "country_code": "NP",
+      "discount_fraction": 0.747706889131209,
+      "price_level_ratio": 0.252293110868791,
+      "source_year": 2024
+    },
+    "NR": {
+      "country_code": "NR",
+      "discount_fraction": 0.03978331647123701,
+      "price_level_ratio": 0.960216683528763,
+      "source_year": 2024
+    },
+    "NZ": {
+      "country_code": "NZ",
+      "discount_fraction": 0.11402008301517397,
+      "price_level_ratio": 0.885979916984826,
+      "source_year": 2024
+    },
+    "OM": {
+      "country_code": "OM",
+      "discount_fraction": 0.514011818707732,
+      "price_level_ratio": 0.485988181292268,
+      "source_year": 2024
+    },
+    "PA": {
+      "country_code": "PA",
+      "discount_fraction": 0.5368265333909761,
+      "price_level_ratio": 0.463173466609024,
+      "source_year": 2024
+    },
+    "PE": {
+      "country_code": "PE",
+      "discount_fraction": 0.525212162082811,
+      "price_level_ratio": 0.474787837917189,
+      "source_year": 2024
+    },
+    "PG": {
+      "country_code": "PG",
+      "discount_fraction": 0.383200639974268,
+      "price_level_ratio": 0.616799360025732,
+      "source_year": 2024
+    },
+    "PH": {
+      "country_code": "PH",
+      "discount_fraction": 0.662134554369818,
+      "price_level_ratio": 0.337865445630182,
+      "source_year": 2024
+    },
+    "PK": {
+      "country_code": "PK",
+      "discount_fraction": 0.763476411166012,
+      "price_level_ratio": 0.236523588833988,
+      "source_year": 2024
+    },
+    "PL": {
+      "country_code": "PL",
+      "discount_fraction": 0.510293870130337,
+      "price_level_ratio": 0.489706129869663,
+      "source_year": 2024
+    },
+    "PR": {
+      "country_code": "PR",
+      "discount_fraction": 0.21700697529825796,
+      "price_level_ratio": 0.782993024701742,
+      "source_year": 2024
+    },
+    "PS": {
+      "country_code": "PS",
+      "discount_fraction": 0.406945808623149,
+      "price_level_ratio": 0.593054191376851,
+      "source_year": 2024
+    },
+    "PT": {
+      "country_code": "PT",
+      "discount_fraction": 0.441499254788281,
+      "price_level_ratio": 0.558500745211719,
+      "source_year": 2024
+    },
+    "PW": {
+      "country_code": "PW",
+      "discount_fraction": 0.14368666450691003,
+      "price_level_ratio": 0.85631333549309,
+      "source_year": 2023
+    },
+    "PY": {
+      "country_code": "PY",
+      "discount_fraction": 0.653627317140208,
+      "price_level_ratio": 0.346372682859792,
+      "source_year": 2024
+    },
+    "QA": {
+      "country_code": "QA",
+      "discount_fraction": 0.391583403882118,
+      "price_level_ratio": 0.608416596117882,
+      "source_year": 2024
+    },
+    "RO": {
+      "country_code": "RO",
+      "discount_fraction": 0.590838929419248,
+      "price_level_ratio": 0.409161070580752,
+      "source_year": 2024
+    },
+    "RS": {
+      "country_code": "RS",
+      "discount_fraction": 0.583359736370942,
+      "price_level_ratio": 0.416640263629058,
+      "source_year": 2024
+    },
+    "RU": {
+      "country_code": "RU",
+      "discount_fraction": 0.685918579884008,
+      "price_level_ratio": 0.314081420115992,
+      "source_year": 2024
+    },
+    "RW": {
+      "country_code": "RW",
+      "discount_fraction": 0.730613805767327,
+      "price_level_ratio": 0.269386194232673,
+      "source_year": 2024
+    },
+    "SA": {
+      "country_code": "SA",
+      "discount_fraction": 0.507930235648829,
+      "price_level_ratio": 0.492069764351171,
+      "source_year": 2024
+    },
+    "SB": {
+      "country_code": "SB",
+      "discount_fraction": 0.277146673761557,
+      "price_level_ratio": 0.722853326238443,
+      "source_year": 2024
+    },
+    "SC": {
+      "country_code": "SC",
+      "discount_fraction": 0.46270801520618,
+      "price_level_ratio": 0.53729198479382,
+      "source_year": 2024
+    },
+    "SD": {
+      "country_code": "SD",
+      "discount_fraction": 0.5346440522914779,
+      "price_level_ratio": 0.465355947708522,
+      "source_year": 2024
+    },
+    "SE": {
+      "country_code": "SE",
+      "discount_fraction": 0.19655780621868102,
+      "price_level_ratio": 0.803442193781319,
+      "source_year": 2024
+    },
+    "SG": {
+      "country_code": "SG",
+      "discount_fraction": 0.39827137259033996,
+      "price_level_ratio": 0.60172862740966,
+      "source_year": 2024
+    },
+    "SI": {
+      "country_code": "SI",
+      "discount_fraction": 0.40419176479140595,
+      "price_level_ratio": 0.595808235208594,
+      "source_year": 2024
+    },
+    "SK": {
+      "country_code": "SK",
+      "discount_fraction": 0.456749995592969,
+      "price_level_ratio": 0.543250004407031,
+      "source_year": 2024
+    },
+    "SL": {
+      "country_code": "SL",
+      "discount_fraction": 0.770986768929665,
+      "price_level_ratio": 0.229013231070335,
+      "source_year": 2024
+    },
+    "SM": {
+      "country_code": "SM",
+      "discount_fraction": 0.23957852169636895,
+      "price_level_ratio": 0.760421478303631,
+      "source_year": 2023
+    },
+    "SN": {
+      "country_code": "SN",
+      "discount_fraction": 0.650297539454614,
+      "price_level_ratio": 0.349702460545386,
+      "source_year": 2024
+    },
+    "SO": {
+      "country_code": "SO",
+      "discount_fraction": 0.6070207334773909,
+      "price_level_ratio": 0.392979266522609,
+      "source_year": 2024
+    },
+    "SR": {
+      "country_code": "SR",
+      "discount_fraction": 0.680659569024343,
+      "price_level_ratio": 0.319340430975657,
+      "source_year": 2024
+    },
+    "SS": {
+      "country_code": "SS",
+      "discount_fraction": 0.33363275698432204,
+      "price_level_ratio": 0.666367243015678,
+      "source_year": 2021
+    },
+    "ST": {
+      "country_code": "ST",
+      "discount_fraction": 0.440780313743786,
+      "price_level_ratio": 0.559219686256214,
+      "source_year": 2024
+    },
+    "SV": {
+      "country_code": "SV",
+      "discount_fraction": 0.579338940324564,
+      "price_level_ratio": 0.420661059675436,
+      "source_year": 2024
+    },
+    "SX": {
+      "country_code": "SX",
+      "discount_fraction": 0.22868471225674303,
+      "price_level_ratio": 0.771315287743257,
+      "source_year": 2024
+    },
+    "SY": {
+      "country_code": "SY",
+      "discount_fraction": 0.8,
+      "price_level_ratio": 0.1822280723381,
+      "source_year": 2023
+    },
+    "SZ": {
+      "country_code": "SZ",
+      "discount_fraction": 0.6686590641954371,
+      "price_level_ratio": 0.331340935804563,
+      "source_year": 2024
+    },
+    "TC": {
+      "country_code": "TC",
+      "discount_fraction": 0.011793308728747953,
+      "price_level_ratio": 0.988206691271252,
+      "source_year": 2024
+    },
+    "TD": {
+      "country_code": "TD",
+      "discount_fraction": 0.6494060790377201,
+      "price_level_ratio": 0.35059392096228,
+      "source_year": 2024
+    },
+    "TG": {
+      "country_code": "TG",
+      "discount_fraction": 0.667391013307792,
+      "price_level_ratio": 0.332608986692208,
+      "source_year": 2024
+    },
+    "TH": {
+      "country_code": "TH",
+      "discount_fraction": 0.702711207400406,
+      "price_level_ratio": 0.297288792599594,
+      "source_year": 2024
+    },
+    "TJ": {
+      "country_code": "TJ",
+      "discount_fraction": 0.751903954241396,
+      "price_level_ratio": 0.248096045758604,
+      "source_year": 2024
+    },
+    "TL": {
+      "country_code": "TL",
+      "discount_fraction": 0.6988385432081581,
+      "price_level_ratio": 0.301161456791842,
+      "source_year": 2024
+    },
+    "TM": {
+      "country_code": "TM",
+      "discount_fraction": 0.676772255275257,
+      "price_level_ratio": 0.323227744724743,
+      "source_year": 2024
+    },
+    "TN": {
+      "country_code": "TN",
+      "discount_fraction": 0.712062835719518,
+      "price_level_ratio": 0.287937164280482,
+      "source_year": 2024
+    },
+    "TO": {
+      "country_code": "TO",
+      "discount_fraction": 0.27568462711573705,
+      "price_level_ratio": 0.724315372884263,
+      "source_year": 2023
+    },
+    "TR": {
+      "country_code": "TR",
+      "discount_fraction": 0.65177350474051,
+      "price_level_ratio": 0.34822649525949,
+      "source_year": 2024
+    },
+    "TT": {
+      "country_code": "TT",
+      "discount_fraction": 0.48433311770117804,
+      "price_level_ratio": 0.515666882298822,
+      "source_year": 2024
+    },
+    "TV": {
+      "country_code": "TV",
+      "discount_fraction": 0.0,
+      "price_level_ratio": 1.03150125485637,
+      "source_year": 2023
+    },
+    "TZ": {
+      "country_code": "TZ",
+      "discount_fraction": 0.718840519662011,
+      "price_level_ratio": 0.281159480337989,
+      "source_year": 2024
+    },
+    "UA": {
+      "country_code": "UA",
+      "discount_fraction": 0.709469614896632,
+      "price_level_ratio": 0.290530385103368,
+      "source_year": 2024
+    },
+    "UG": {
+      "country_code": "UG",
+      "discount_fraction": 0.670692086168444,
+      "price_level_ratio": 0.329307913831556,
+      "source_year": 2024
+    },
+    "US": {
+      "country_code": "US",
+      "discount_fraction": 0.0,
+      "price_level_ratio": 1.0,
+      "source_year": 2024
+    },
+    "UY": {
+      "country_code": "UY",
+      "discount_fraction": 0.34355000524549295,
+      "price_level_ratio": 0.656449994754507,
+      "source_year": 2024
+    },
+    "UZ": {
+      "country_code": "UZ",
+      "discount_fraction": 0.733831204798395,
+      "price_level_ratio": 0.266168795201605,
+      "source_year": 2024
+    },
+    "VC": {
+      "country_code": "VC",
+      "discount_fraction": 0.45932760302256703,
+      "price_level_ratio": 0.540672396977433,
+      "source_year": 2024
+    },
+    "VE": {
+      "country_code": "VE",
+      "discount_fraction": 0.37496034557581004,
+      "price_level_ratio": 0.62503965442419,
+      "source_year": 2011
+    },
+    "VI": {
+      "country_code": "VI",
+      "discount_fraction": 0.109897368882658,
+      "price_level_ratio": 0.890102631117342,
+      "source_year": 2022
+    },
+    "VN": {
+      "country_code": "VN",
+      "discount_fraction": 0.712105922935901,
+      "price_level_ratio": 0.287894077064099,
+      "source_year": 2024
+    },
+    "VU": {
+      "country_code": "VU",
+      "discount_fraction": 0.054037257920558024,
+      "price_level_ratio": 0.945962742079442,
+      "source_year": 2024
+    },
+    "WS": {
+      "country_code": "WS",
+      "discount_fraction": 0.382741083553376,
+      "price_level_ratio": 0.617258916446624,
+      "source_year": 2024
+    },
+    "XK": {
+      "country_code": "XK",
+      "discount_fraction": 0.6068684260698061,
+      "price_level_ratio": 0.393131573930194,
+      "source_year": 2024
+    },
+    "YE": {
+      "country_code": "YE",
+      "discount_fraction": 0.5642825764871711,
+      "price_level_ratio": 0.435717423512829,
+      "source_year": 2013
+    },
+    "ZA": {
+      "country_code": "ZA",
+      "discount_fraction": 0.594519531174317,
+      "price_level_ratio": 0.405480468825683,
+      "source_year": 2024
+    },
+    "ZM": {
+      "country_code": "ZM",
+      "discount_fraction": 0.7183535866716839,
+      "price_level_ratio": 0.281646413328316,
+      "source_year": 2024
+    },
+    "ZW": {
+      "country_code": "ZW",
+      "discount_fraction": 0.5787501081816779,
+      "price_level_ratio": 0.421249891818322,
+      "source_year": 2024
+    }
+  },
+  "metadata": {
+    "country_count": 202,
+    "generated_at": "2026-04-05T20:47:10.692346Z",
+    "indicator": "PA.NUS.PPPC.RF",
+    "max_discount": 0.8,
+    "source": "World Development Indicators",
+    "source_url": "https://api.worldbank.org/v2/country/all/indicator/PA.NUS.PPPC.RF?format=json&mrnev=1&per_page=20000"
+  }
+}
