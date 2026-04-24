@@ -3,12 +3,76 @@ substitutions:
   _SERVICE_NAME: dynamic-ppp-api
   _AR_REPOSITORY: ppp-api
   _IMAGE_NAME: dynamic-ppp-api
+  _IPLOCATE_SECRET_NAME: iplocate-api-key
+  _IPLOCATE_VARIANT: daily
   _MEMORY: 512Mi
   _CPU: "1"
   _MIN_INSTANCES: "0"
   _MAX_INSTANCES: "10"
 
 steps:
+  - name: python:3.13-slim
+    entrypoint: python
+    secretEnv:
+      - IPLOCATE_API_KEY
+    args:
+      - -c
+      - |
+        import os
+        import tempfile
+        from pathlib import Path
+        from urllib.parse import quote
+        from urllib.request import Request, urlopen
+
+        api_key = os.environ.get("IPLOCATE_API_KEY")
+        if not api_key:
+            raise SystemExit("IPLOCATE_API_KEY was not provided to Cloud Build.")
+
+        variant = os.environ.get("_IPLOCATE_VARIANT", "daily")
+        download_url = (
+            "https://www.iplocate.io/download/ip-to-country.mmdb"
+            f"?apikey={quote(api_key)}&variant={quote(variant)}"
+        )
+        request = Request(
+            download_url,
+            headers={
+                "Accept": "*/*",
+                "User-Agent": (
+                    "DynamicPPPAPI/1.0 (+https://www.iplocate.io/docs/data-feeds)"
+                ),
+            },
+        )
+
+        with urlopen(request, timeout=60) as response:  # noqa: S310
+            content_type = response.headers.get("content-type", "").lower()
+            final_url = response.geturl()
+            contents = response.read()
+
+        if not contents:
+            raise SystemExit("Downloaded GeoIP MMDB file was empty.")
+
+        if final_url.endswith("/login") or "text/html" in content_type:
+            raise SystemExit(
+                "GeoIP MMDB download returned HTML instead of a binary MMDB file."
+            )
+
+        if contents[:1] == b"<":
+            raise SystemExit(
+                "GeoIP MMDB download returned text/HTML content instead of MMDB bytes."
+            )
+
+        destination_path = Path("dynamic_ppp_api/data/ip-to-country.mmdb")
+        destination_path.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.NamedTemporaryFile(
+            "wb", delete=False, dir=destination_path.parent
+        ) as handle:
+            handle.write(contents)
+            temp_path = Path(handle.name)
+        temp_path.replace(destination_path)
+        print(f"GeoIP MMDB written to {destination_path}")
+    env:
+      - _IPLOCATE_VARIANT=${_IPLOCATE_VARIANT}
+
   - name: gcr.io/cloud-builders/docker
     args:
       - build
@@ -40,6 +104,11 @@ steps:
 
 images:
   - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPOSITORY}/${_IMAGE_NAME}:$COMMIT_SHA
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/${_IPLOCATE_SECRET_NAME}/versions/latest
+      env: IPLOCATE_API_KEY
 
 options:
   logging: CLOUD_LOGGING_ONLY

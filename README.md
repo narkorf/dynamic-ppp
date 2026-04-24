@@ -41,11 +41,15 @@ This repo includes [`cloudbuild.yaml`](/Users/nanaarkorful/Documents/Dynamic Pur
 - Region: `us-east1`
 - Artifact Registry repository: `ppp-api`
 - Cloud Run service: `dynamic-ppp-api`
+- Secret Manager secret: `iplocate-api-key`
+- IPLocate variant: `daily`
 - Memory: `512Mi`
 - CPU: `1`
 - Min instances: `0`
 - Max instances: `10`
 - Container port: `8000`
+
+Before Cloud Build can deploy successfully, it must download the GeoIP MMDB file into the build workspace. The build now does that automatically using an `IPLOCATE_API_KEY` stored in Secret Manager. The MMDB file stays out of Git, but it is still baked into the container image during the build.
 
 ### 1. Set your Google Cloud defaults
 
@@ -87,7 +91,23 @@ gcloud iam service-accounts create "${SERVICE_NAME}-runner" \
   --display-name="Dynamic PPP API runtime"
 ```
 
-### 5. Grant Cloud Build permission to build and deploy
+### 5. Create the Secret Manager secret for the MMDB download
+
+```bash
+printf '%s' 'YOUR_IPLOCATE_API_KEY' | \
+gcloud secrets create iplocate-api-key \
+  --data-file=-
+```
+
+If the secret already exists, add a new version instead:
+
+```bash
+printf '%s' 'YOUR_IPLOCATE_API_KEY' | \
+gcloud secrets versions add iplocate-api-key \
+  --data-file=-
+```
+
+### 6. Grant Cloud Build permission to build, deploy, and read the secret
 
 ```bash
 export CLOUDBUILD_SA="${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com"
@@ -113,12 +133,16 @@ gcloud projects add-iam-policy-binding "$PROJECT_ID" \
   --member="serviceAccount:${CLOUDBUILD_SA}" \
   --role="roles/cloudbuild.builds.editor"
 
+gcloud secrets add-iam-policy-binding iplocate-api-key \
+  --member="serviceAccount:${CLOUDBUILD_SA}" \
+  --role="roles/secretmanager.secretAccessor"
+
 gcloud iam service-accounts add-iam-policy-binding "$RUNTIME_SA" \
   --member="serviceAccount:${CLOUDBUILD_SA}" \
   --role="roles/iam.serviceAccountUser"
 ```
 
-### 6. Connect GitHub and create the trigger
+### 7. Connect GitHub and create the trigger
 
 1. In Google Cloud Console, open `Cloud Build` > `Triggers`.
 2. Click `Connect repository` and authorize the GitHub repo that contains this project.
@@ -128,15 +152,23 @@ gcloud iam service-accounts add-iam-policy-binding "$RUNTIME_SA" \
 
 If you want different service names or sizing later, update the substitutions in [`cloudbuild.yaml`](/Users/nanaarkorful/Documents/Dynamic Purchasing Power Parity API/cloudbuild.yaml) or override them in the trigger configuration.
 
-### 7. Push to `main` to launch the first deploy
+The build config also supports these substitutions:
+
+- `_IPLOCATE_SECRET_NAME`, default `iplocate-api-key`
+- `_IPLOCATE_VARIANT`, default `daily`
+
+Only change those if you intentionally renamed the secret or want a different IPLocate feed variant.
+
+### 8. Push to `main` to launch the first deploy
 
 Each push to your production branch will:
 
-1. Build the Docker image from the repo `Dockerfile`
-2. Push it to Artifact Registry
-3. Deploy a new Cloud Run revision
+1. Download `dynamic_ppp_api/data/ip-to-country.mmdb` from IPLocate using Secret Manager
+2. Build the Docker image from the repo `Dockerfile`
+3. Push it to Artifact Registry
+4. Deploy a new Cloud Run revision
 
-### 8. Verify the live service
+### 9. Verify the live service
 
 After the first build finishes, open the Cloud Run service URL and verify:
 
@@ -152,7 +184,9 @@ You can also check:
 - Logs in `Cloud Run` > your service > `Logs`
 - Revisions in `Cloud Run` > your service > `Revisions`
 
-### 9. Add low-cost guardrails
+If you fixed a previous failed deploy, re-run the trigger or push a new commit after the secret and IAM access are in place.
+
+### 10. Add low-cost guardrails
 
 - Set a billing budget alert for the project
 - Keep `min instances` at `0` to allow scale-to-zero
@@ -164,4 +198,5 @@ You can also check:
 - The service validates both the GeoIP MMDB database and the PPP snapshot during startup.
 - The refresh command builds the iplocate download URL from `IPLOCATE_API_KEY` and `IPLOCATE_VARIANT`, or uses `IPLOCATE_DOWNLOAD_URL` if you provide a full override.
 - The bundled PPP snapshot is a starter dataset in the production schema. Run `ppp-api-refresh` before deployment to pull the latest World Bank data and replace it with a current snapshot.
+- Cloud Build downloads the GeoIP MMDB file from IPLocate at build time using Secret Manager, so the MMDB file does not need to be committed to Git.
 - Cloud Run is configured to send traffic to container port `8000`, which matches the current Docker image.
