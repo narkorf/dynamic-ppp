@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import urlparse
 from urllib.parse import quote
+from urllib.error import HTTPError
 from urllib.request import urlopen
 
 import httpx
@@ -18,9 +19,10 @@ from dynamic_ppp_api.models import PppCountryRecord, PppSnapshot, PppSnapshotMet
 from dynamic_ppp_api.pricing import derive_discount_from_price_level_ratio
 
 WORLD_BANK_COUNTRIES_URL = "https://api.worldbank.org/v2/country?format=json&per_page=400"
+WORLD_BANK_SOURCE_ID = "2"
 WORLD_BANK_INDICATOR_URL = (
     "https://api.worldbank.org/v2/country/all/indicator/{indicator}"
-    "?format=json&mrnev=1&per_page=20000"
+    "?format=json&mrnev=1&per_page=20000&source={source_id}"
 )
 DEFAULT_WORLD_BANK_INDICATOR = "PA.NUS.GDP.PLI"
 IPLOCATE_DOWNLOAD_URL = (
@@ -32,8 +34,16 @@ IPLOCATE_DOWNLOAD_URL = (
 def fetch_json(url: str) -> list[object]:
     """Fetch a JSON payload from a URL."""
 
-    with urlopen(url) as response:  # noqa: S310 - explicit trusted sources only
-        return json.load(response)
+    try:
+        with urlopen(url) as response:  # noqa: S310 - explicit trusted sources only
+            return json.load(response)
+    except HTTPError as exc:
+        try:
+            return json.load(exc)
+        except json.JSONDecodeError as json_exc:
+            raise RuntimeError(
+                f"World Bank API request failed with HTTP {exc.code} for {url}"
+            ) from json_exc
 
 
 def extract_world_bank_records(payload: object, *, resource_name: str) -> list[dict[str, object]]:
@@ -112,7 +122,12 @@ def build_ppp_snapshot(indicator: str, max_discount: float) -> PppSnapshot:
     """Fetch the latest PPP data and convert it into the local snapshot schema."""
 
     country_lookup = build_country_code_lookup()
-    payload = fetch_json(WORLD_BANK_INDICATOR_URL.format(indicator=quote(indicator)))
+    payload = fetch_json(
+        WORLD_BANK_INDICATOR_URL.format(
+            indicator=quote(indicator),
+            source_id=WORLD_BANK_SOURCE_ID,
+        )
+    )
     records = extract_world_bank_records(payload, resource_name=f"indicator {indicator}")
 
     country_records: dict[str, PppCountryRecord] = {}
@@ -140,7 +155,10 @@ def build_ppp_snapshot(indicator: str, max_discount: float) -> PppSnapshot:
         metadata=PppSnapshotMetadata(
             source="World Development Indicators",
             indicator=indicator,
-            source_url=WORLD_BANK_INDICATOR_URL.format(indicator=indicator),
+            source_url=WORLD_BANK_INDICATOR_URL.format(
+                indicator=indicator,
+                source_id=WORLD_BANK_SOURCE_ID,
+            ),
             generated_at=datetime.now(UTC),
             max_discount=max_discount,
             country_count=len(country_records),

@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+from io import BytesIO
 from pathlib import Path
+from urllib.error import HTTPError
 
 import pytest
 from fastapi.testclient import TestClient
@@ -268,6 +270,7 @@ def test_build_ppp_snapshot_normalizes_price_level_index_values(
     snapshot = refresh_data.build_ppp_snapshot("PA.NUS.GDP.PLI", 0.80)
 
     assert snapshot.metadata.indicator == "PA.NUS.GDP.PLI"
+    assert "source=2" in snapshot.metadata.source_url
     assert snapshot.countries["US"].price_level_ratio == 1.0
     assert snapshot.countries["US"].discount_fraction == 0.0
     assert snapshot.countries["IN"].price_level_ratio == 0.24
@@ -286,6 +289,45 @@ def test_build_ppp_snapshot_raises_descriptive_error_for_bad_indicator_payload(
 
     with pytest.raises(RuntimeError, match="The indicator was not found."):
         refresh_data.build_ppp_snapshot("PA.NUS.GDP.PLI", 0.80)
+
+
+def test_fetch_json_reads_world_bank_error_payload_from_http_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    payload = b'[{"message":[{"value":"The provided parameter value is not valid."}]}]'
+
+    def fake_urlopen(_: str):
+        raise HTTPError(
+            url="https://api.worldbank.org/test",
+            code=400,
+            msg="Bad Request",
+            hdrs=None,
+            fp=BytesIO(payload),
+        )
+
+    monkeypatch.setattr(refresh_data, "urlopen", fake_urlopen)
+
+    assert refresh_data.fetch_json("https://api.worldbank.org/test") == [
+        {"message": [{"value": "The provided parameter value is not valid."}]}
+    ]
+
+
+def test_fetch_json_raises_runtime_error_for_non_json_http_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fake_urlopen(_: str):
+        raise HTTPError(
+            url="https://api.worldbank.org/test",
+            code=400,
+            msg="Bad Request",
+            hdrs=None,
+            fp=BytesIO(b"bad response"),
+        )
+
+    monkeypatch.setattr(refresh_data, "urlopen", fake_urlopen)
+
+    with pytest.raises(RuntimeError, match="HTTP 400"):
+        refresh_data.fetch_json("https://api.worldbank.org/test")
 
 
 def test_download_geoip_database_writes_binary_file(
