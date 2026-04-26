@@ -204,7 +204,7 @@ If you fixed a previous failed deploy, re-run the trigger or push a new commit a
 This repo includes the GitHub Actions workflow [`weekly-ppp-refresh.yml`](/Users/nanaarkorful/Documents/Dynamic Purchasing Power Parity API/.github/workflows/weekly-ppp-refresh.yml). It runs every Monday at `13:00 UTC`, refreshes `dynamic_ppp_api/data/ppp_snapshot.json`, commits the updated snapshot back to `main`, and lets your existing Cloud Build trigger redeploy the service.
 
 The weekly workflow only refreshes the PPP snapshot. The GeoIP MMDB file is still downloaded at build time by Cloud Build, so the GitHub workflow does not need the IPLocate API key.
-The PPP refresh now defaults to the World Bank `PA.NUS.GDP.PLI` indicator and converts that price-level index back into the ratio scale used by the API.
+The PPP refresh now defaults to the World Bank `PA.NUS.GDP.PLI` indicator, downloads the World Bank CSV bundle for that indicator, and converts the price-level index back into the ratio scale used by the API.
 
 To use the weekly refresh:
 
@@ -221,7 +221,7 @@ You can also run it manually from `GitHub` > `Actions` > `Weekly PPP Refresh` > 
 - The service validates both the GeoIP MMDB database and the PPP snapshot during startup.
 - The refresh command builds the iplocate download URL from `IPLOCATE_API_KEY` and `IPLOCATE_VARIANT`, or uses `IPLOCATE_DOWNLOAD_URL` if you provide a full override.
 - The bundled PPP snapshot is a starter dataset in the production schema. Run `ppp-api-refresh` before deployment to pull the latest World Bank data and replace it with a current snapshot.
-- PPP snapshot refreshes now default to the World Bank `PA.NUS.GDP.PLI` indicator and convert that index to `price_level_ratio` by dividing by `100`.
+- PPP snapshot refreshes now default to the World Bank `PA.NUS.GDP.PLI` indicator, using the World Bank CSV download bundle and converting that index to `price_level_ratio` by dividing by `100`.
 - If the World Bank API changes again or returns an invalid payload, the weekly workflow fails clearly and leaves the last committed snapshot untouched.
 - Use `--skip-geoip` when you only want to refresh the PPP snapshot without downloading the MMDB file.
 - Cloud Build downloads the GeoIP MMDB file from IPLocate at build time using Secret Manager, so the MMDB file does not need to be committed to Git.

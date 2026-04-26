@@ -3,75 +3,168 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
+import re
 import tempfile
 from datetime import UTC, datetime
+from io import BytesIO, StringIO
 from pathlib import Path
+from zipfile import ZipFile
 from urllib.parse import urlparse
 from urllib.parse import quote
 from urllib.error import HTTPError
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 import httpx
+import pycountry
 
 from dynamic_ppp_api.config import DEFAULT_DATA_DIR, Settings
 from dynamic_ppp_api.models import PppCountryRecord, PppSnapshot, PppSnapshotMetadata
 from dynamic_ppp_api.pricing import derive_discount_from_price_level_ratio
 
-WORLD_BANK_COUNTRIES_URL = "https://api.worldbank.org/v2/country?format=json&per_page=400"
 WORLD_BANK_SOURCE_ID = "2"
-WORLD_BANK_INDICATOR_URL = (
+WORLD_BANK_INDICATOR_DOWNLOAD_URL = (
     "https://api.worldbank.org/v2/country/all/indicator/{indicator}"
-    "?format=json&mrnev=1&per_page=20000&source={source_id}"
+    "?source={source_id}&downloadformat=csv"
 )
 DEFAULT_WORLD_BANK_INDICATOR = "PA.NUS.GDP.PLI"
+WORLD_BANK_HEADERS = {
+    "Accept": "*/*",
+    "User-Agent": (
+        "Mozilla/5.0 (compatible; DynamicPPPAPI/1.0; "
+        "+https://datahelpdesk.worldbank.org/)"
+    ),
+}
 IPLOCATE_DOWNLOAD_URL = (
     "https://www.iplocate.io/download/ip-to-country.mmdb"
     "?apikey={api_key}&variant={variant}"
 )
+YEAR_COLUMN_PATTERN = re.compile(r"^(?P<year>\d{4})(?:\s*\[YR\d{4}\])?$")
 
 
-def fetch_json(url: str) -> list[object]:
-    """Fetch a JSON payload from a URL."""
+def fetch_binary(url: str) -> bytes:
+    """Fetch a binary payload from a URL."""
 
+    request = Request(url, headers=WORLD_BANK_HEADERS)
     try:
-        with urlopen(url) as response:  # noqa: S310 - explicit trusted sources only
-            return json.load(response)
+        with urlopen(request, timeout=60) as response:  # noqa: S310 - explicit trusted sources only
+            return response.read()
     except HTTPError as exc:
-        try:
-            return json.load(exc)
-        except json.JSONDecodeError as json_exc:
-            raise RuntimeError(
-                f"World Bank API request failed with HTTP {exc.code} for {url}"
-            ) from json_exc
+        error_bytes = exc.read()
+        body_preview = error_bytes.decode("utf-8", errors="replace")[:200]
+        raise RuntimeError(
+            f"World Bank API request failed with HTTP {exc.code} for {url}. "
+            f"Response body started with: {body_preview!r}"
+        ) from exc
 
 
-def extract_world_bank_records(payload: object, *, resource_name: str) -> list[dict[str, object]]:
-    """Validate a World Bank JSON payload and return its records."""
+def read_csv_rows_from_zip(bundle_bytes: bytes) -> dict[str, list[dict[str, str]]]:
+    """Read CSV files from a World Bank download bundle."""
 
-    if (
-        isinstance(payload, list)
-        and len(payload) >= 2
-        and isinstance(payload[1], list)
-    ):
-        return payload[1]
+    csv_entries: dict[str, list[dict[str, str]]] = {}
+    with ZipFile(BytesIO(bundle_bytes)) as archive:
+        for name in archive.namelist():
+            if not name.lower().endswith(".csv"):
+                continue
+            text = archive.read(name).decode("utf-8-sig")
+            csv_text = strip_world_bank_csv_preamble(text)
+            reader = csv.DictReader(StringIO(csv_text))
+            csv_entries[name] = [dict(row) for row in reader]
+    if not csv_entries:
+        raise RuntimeError("World Bank CSV download did not contain any CSV files.")
+    return csv_entries
 
-    if isinstance(payload, list) and payload:
-        error_block = payload[0]
-        if isinstance(error_block, dict):
-            message_items = error_block.get("message")
-            if isinstance(message_items, list) and message_items:
-                first_message = message_items[0]
-                if isinstance(first_message, dict):
-                    value = first_message.get("value")
-                    if isinstance(value, str) and value:
-                        raise RuntimeError(
-                            f"World Bank {resource_name} request failed: {value}"
-                        )
 
+def strip_world_bank_csv_preamble(text: str) -> str:
+    """Drop leading World Bank CSV preamble lines before the actual header row."""
+
+    lines = text.splitlines()
+    for index, line in enumerate(lines):
+        parsed = next(csv.reader([line]), [])
+        normalized = [part.strip().lower() for part in parsed]
+        if "country code" not in normalized:
+            continue
+        if "indicator code" in normalized or any(is_year_column(part) for part in parsed):
+            return "\n".join(lines[index:])
+
+    return text
+
+
+def find_indicator_data_rows(
+    csv_entries: dict[str, list[dict[str, str]]], indicator: str
+) -> list[dict[str, str]]:
+    """Locate the data CSV rows for the requested indicator."""
+
+    fallback_rows: list[dict[str, str]] | None = None
+    for rows in csv_entries.values():
+        if not rows:
+            continue
+        headers = set(rows[0].keys())
+        if "Country Code" not in headers:
+            continue
+        year_headers = [header for header in headers if is_year_column(header)]
+        if not year_headers:
+            continue
+
+        if "Indicator Code" in headers:
+            matching_rows = [row for row in rows if row.get("Indicator Code") == indicator]
+            if matching_rows:
+                return matching_rows
+            continue
+
+        # Single-indicator World Bank CSV downloads may omit Indicator Code/Name columns.
+        if fallback_rows is None:
+            fallback_rows = rows
+
+    if fallback_rows:
+        return fallback_rows
     raise RuntimeError(
-        f"World Bank {resource_name} request returned an unexpected payload shape."
+        f"World Bank CSV download did not contain data rows for indicator {indicator}."
     )
+
+
+def resolve_iso2_country_code(iso3_code: str) -> str | None:
+    """Resolve an ISO3 country code to ISO2 using the local pycountry database."""
+
+    country = pycountry.countries.get(alpha_3=iso3_code.upper())
+    if country and hasattr(country, "alpha_2"):
+        return str(country.alpha_2).upper()
+    return None
+
+
+def is_year_column(header: str | None) -> bool:
+    """Return whether a CSV header looks like a World Bank year column."""
+
+    if not header:
+        return False
+    return YEAR_COLUMN_PATTERN.fullmatch(header.strip()) is not None
+
+
+def parse_year_column(header: str) -> int | None:
+    """Extract the year number from a World Bank year column header."""
+
+    match = YEAR_COLUMN_PATTERN.fullmatch(header.strip())
+    if not match:
+        return None
+    return int(match.group("year"))
+
+
+def extract_latest_indicator_value(row: dict[str, str]) -> tuple[int, float] | None:
+    """Extract the most recent non-empty yearly value from a World Bank indicator row."""
+
+    latest: tuple[int, float] | None = None
+    for key, value in row.items():
+        year = parse_year_column(key) if key else None
+        if year is None:
+            continue
+        raw_value = str(value).strip()
+        if not raw_value:
+            continue
+        parsed_value = float(raw_value)
+        if latest is None or year > latest[0]:
+            latest = (year, parsed_value)
+    return latest
 
 
 def normalize_price_level_ratio(indicator: str, value: float) -> float:
@@ -104,41 +197,31 @@ def atomic_write_binary(path: Path, contents: bytes) -> None:
     temp_path.replace(path)
 
 
-def build_country_code_lookup() -> dict[str, str]:
-    """Build an ISO3 -> ISO2 lookup table from the World Bank country endpoint."""
-
-    payload = fetch_json(WORLD_BANK_COUNTRIES_URL)
-    countries = extract_world_bank_records(payload, resource_name="country lookup")
-    lookup: dict[str, str] = {}
-    for country in countries:
-        iso2_code = country.get("iso2Code")
-        iso3_code = country.get("id")
-        if iso2_code and iso2_code != "NA" and iso3_code:
-            lookup[str(iso3_code).upper()] = str(iso2_code).upper()
-    return lookup
-
-
 def build_ppp_snapshot(indicator: str, max_discount: float) -> PppSnapshot:
     """Fetch the latest PPP data and convert it into the local snapshot schema."""
 
-    country_lookup = build_country_code_lookup()
-    payload = fetch_json(
-        WORLD_BANK_INDICATOR_URL.format(
-            indicator=quote(indicator),
-            source_id=WORLD_BANK_SOURCE_ID,
-        )
+    source_url = WORLD_BANK_INDICATOR_DOWNLOAD_URL.format(
+        indicator=quote(indicator),
+        source_id=WORLD_BANK_SOURCE_ID,
     )
-    records = extract_world_bank_records(payload, resource_name=f"indicator {indicator}")
+    csv_entries = read_csv_rows_from_zip(fetch_binary(source_url))
+    rows = find_indicator_data_rows(csv_entries, indicator)
 
     country_records: dict[str, PppCountryRecord] = {}
-    for row in records:
-        value = row.get("value")
-        iso3_code = str(row.get("countryiso3code", "")).upper()
-        if value is None or not iso3_code or iso3_code not in country_lookup:
+    for row in rows:
+        iso3_code = str(row.get("Country Code", "")).strip().upper()
+        if not iso3_code:
+            continue
+        country_code = resolve_iso2_country_code(iso3_code)
+        if not country_code:
             continue
 
-        country_code = country_lookup[iso3_code]
-        price_level_ratio = normalize_price_level_ratio(indicator, float(value))
+        latest_value = extract_latest_indicator_value(row)
+        if latest_value is None:
+            continue
+
+        source_year, raw_value = latest_value
+        price_level_ratio = normalize_price_level_ratio(indicator, raw_value)
         discount_fraction = derive_discount_from_price_level_ratio(
             price_level_ratio=price_level_ratio,
             max_discount=max_discount,
@@ -148,19 +231,16 @@ def build_ppp_snapshot(indicator: str, max_discount: float) -> PppSnapshot:
             country_code=country_code,
             price_level_ratio=price_level_ratio,
             discount_fraction=discount_fraction,
-            source_year=int(row["date"]),
+            source_year=source_year,
         )
 
     snapshot = PppSnapshot(
         metadata=PppSnapshotMetadata(
             source="World Development Indicators",
-            indicator=indicator,
-            source_url=WORLD_BANK_INDICATOR_URL.format(
-                indicator=indicator,
-                source_id=WORLD_BANK_SOURCE_ID,
-            ),
-            generated_at=datetime.now(UTC),
+            indicator=quote(indicator),
             max_discount=max_discount,
+            source_url=source_url,
+            generated_at=datetime.now(UTC),
             country_count=len(country_records),
         ),
         countries=country_records,

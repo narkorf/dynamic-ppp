@@ -6,6 +6,7 @@ import json
 from io import BytesIO
 from pathlib import Path
 from urllib.error import HTTPError
+from zipfile import ZipFile
 
 import pytest
 from fastapi.testclient import TestClient
@@ -206,28 +207,53 @@ def test_build_iplocate_download_url_uses_api_key_and_variant() -> None:
     assert "variant=daily" in url
 
 
-def test_extract_world_bank_records_returns_record_list() -> None:
-    payload = [{"page": 1, "pages": 1}, [{"id": "USA", "iso2Code": "US"}]]
-
-    assert refresh_data.extract_world_bank_records(
-        payload, resource_name="country lookup"
-    ) == [{"id": "USA", "iso2Code": "US"}]
-
-
-def test_extract_world_bank_records_raises_descriptive_error_for_api_message() -> None:
-    payload = [{"message": [{"value": "The indicator was not found."}]}]
-
-    with pytest.raises(RuntimeError, match="The indicator was not found."):
-        refresh_data.extract_world_bank_records(
-            payload, resource_name="indicator PA.NUS.GDP.PLI"
-        )
+def build_world_bank_csv_bundle(
+    *, data_csv: str, country_metadata_csv: str, indicator_metadata_csv: str = "Country Code,Indicator Name,Indicator Code\n"
+) -> bytes:
+    buffer = BytesIO()
+    with ZipFile(buffer, "w") as archive:
+        archive.writestr("API_DATA.csv", data_csv)
+        archive.writestr("Metadata_Country.csv", country_metadata_csv)
+        archive.writestr("Metadata_Indicator.csv", indicator_metadata_csv)
+    return buffer.getvalue()
 
 
-def test_extract_world_bank_records_raises_for_unexpected_payload_shape() -> None:
-    with pytest.raises(RuntimeError, match="unexpected payload shape"):
-        refresh_data.extract_world_bank_records(
-            {"message": "bad"}, resource_name="country lookup"
-        )
+def test_read_csv_rows_from_zip_returns_csv_contents() -> None:
+    bundle = build_world_bank_csv_bundle(
+        data_csv="Country Name,Country Code,Indicator Name,Indicator Code,2024\nUnited States,USA,PLI,PA.NUS.GDP.PLI,100\n",
+        country_metadata_csv="Country Code,2-alpha code\nUSA,US\n",
+    )
+
+    rows = refresh_data.read_csv_rows_from_zip(bundle)
+
+    assert "API_DATA.csv" in rows
+    assert rows["API_DATA.csv"][0]["Country Code"] == "USA"
+
+
+def test_read_csv_rows_from_zip_skips_world_bank_preamble_lines() -> None:
+    bundle = build_world_bank_csv_bundle(
+        data_csv=(
+            "Data Source,World Development Indicators\n"
+            "Last Updated Date,2026-04-01\n"
+            "\n"
+            "Country Name,Country Code,Indicator Name,Indicator Code,2024 [YR2024]\n"
+            "United States,USA,PLI,PA.NUS.GDP.PLI,100\n"
+        ),
+        country_metadata_csv="Country Code,2-alpha code\nUSA,US\n",
+    )
+
+    rows = refresh_data.read_csv_rows_from_zip(bundle)
+
+    assert rows["API_DATA.csv"][0]["Indicator Code"] == "PA.NUS.GDP.PLI"
+
+
+def test_read_csv_rows_from_zip_raises_when_zip_has_no_csv_files() -> None:
+    buffer = BytesIO()
+    with ZipFile(buffer, "w") as archive:
+        archive.writestr("README.txt", "hello")
+
+    with pytest.raises(RuntimeError, match="did not contain any CSV files"):
+        refresh_data.read_csv_rows_from_zip(buffer.getvalue())
 
 
 def test_normalize_price_level_ratio_for_gdp_price_level_index() -> None:
@@ -239,95 +265,127 @@ def test_normalize_price_level_ratio_preserves_ratio_indicator_values() -> None:
     assert refresh_data.normalize_price_level_ratio("PA.NUS.PPPC.RF", 0.24) == 0.24
 
 
-def test_build_country_code_lookup_raises_for_bad_world_bank_payload(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    monkeypatch.setattr(refresh_data, "fetch_json", lambda _: [{"message": [{"value": "Broken"}]}])
+def test_is_year_column_accepts_world_bank_year_formats() -> None:
+    assert refresh_data.is_year_column("2024")
+    assert refresh_data.is_year_column("2024 [YR2024]")
+    assert not refresh_data.is_year_column("Country Code")
 
-    with pytest.raises(RuntimeError, match="World Bank country lookup request failed"):
-        refresh_data.build_country_code_lookup()
+
+def test_parse_year_column_extracts_year_from_world_bank_header() -> None:
+    assert refresh_data.parse_year_column("2024") == 2024
+    assert refresh_data.parse_year_column("2024 [YR2024]") == 2024
+    assert refresh_data.parse_year_column("Country Code") is None
+
+
+def test_resolve_iso2_country_code_returns_iso2_code() -> None:
+    assert refresh_data.resolve_iso2_country_code("USA") == "US"
+    assert refresh_data.resolve_iso2_country_code("IND") == "IN"
+
+
+def test_resolve_iso2_country_code_returns_none_for_unknown_code() -> None:
+    assert refresh_data.resolve_iso2_country_code("ZZZ") is None
+
+
+def test_find_indicator_data_rows_returns_matching_rows() -> None:
+    rows = {
+        "API_DATA.csv": [
+            {"Country Code": "USA", "Indicator Code": "PA.NUS.GDP.PLI", "2024": "100"},
+            {"Country Code": "USA", "Indicator Code": "OTHER", "2024": "5"},
+        ]
+    }
+
+    assert refresh_data.find_indicator_data_rows(rows, "PA.NUS.GDP.PLI") == [
+        {"Country Code": "USA", "Indicator Code": "PA.NUS.GDP.PLI", "2024": "100"}
+    ]
+
+
+def test_find_indicator_data_rows_accepts_single_indicator_csv_without_indicator_code() -> None:
+    rows = {
+        "API_DATA.csv": [
+            {
+                "Country Name": "United States",
+                "Country Code": "USA",
+                "2024 [YR2024]": "100",
+            },
+            {"Country Name": "India", "Country Code": "IND", "2024 [YR2024]": "24"},
+        ]
+    }
+
+    assert refresh_data.find_indicator_data_rows(rows, "PA.NUS.GDP.PLI") == rows["API_DATA.csv"]
+
+
+def test_find_indicator_data_rows_raises_when_indicator_missing() -> None:
+    with pytest.raises(RuntimeError, match="did not contain data rows"):
+        refresh_data.find_indicator_data_rows({}, "PA.NUS.GDP.PLI")
+
+
+def test_extract_latest_indicator_value_returns_latest_non_empty_year() -> None:
+    row = {"2022 [YR2022]": "", "2023 [YR2023]": "24.5", "2024 [YR2024]": "25.0"}
+
+    assert refresh_data.extract_latest_indicator_value(row) == (2024, 25.0)
+
+
+def test_extract_latest_indicator_value_returns_none_when_no_year_values() -> None:
+    assert refresh_data.extract_latest_indicator_value({"Country Code": "USA"}) is None
 
 
 def test_build_ppp_snapshot_normalizes_price_level_index_values(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    def fake_fetch_json(url: str) -> list[object]:
-        if "country?format=json" in url:
-            return [
-                {"page": 1, "pages": 1},
-                [{"id": "USA", "iso2Code": "US"}, {"id": "IND", "iso2Code": "IN"}],
-            ]
-        return [
-            {"page": 1, "pages": 1},
-            [
-                {"countryiso3code": "USA", "value": 100.0, "date": "2024"},
-                {"countryiso3code": "IND", "value": 24.0, "date": "2024"},
-            ],
-        ]
+    bundle = build_world_bank_csv_bundle(
+        data_csv=(
+            "Country Name,Country Code,Indicator Name,Indicator Code,2023 [YR2023],2024 [YR2024]\n"
+            "United States,USA,Price level index (GDP),PA.NUS.GDP.PLI,99,100\n"
+            "India,IND,Price level index (GDP),PA.NUS.GDP.PLI,23,24\n"
+        ),
+        country_metadata_csv="Country Code,TableName\nUSA,United States\nIND,India\n",
+    )
 
-    monkeypatch.setattr(refresh_data, "fetch_json", fake_fetch_json)
+    monkeypatch.setattr(refresh_data, "fetch_binary", lambda _: bundle)
 
     snapshot = refresh_data.build_ppp_snapshot("PA.NUS.GDP.PLI", 0.80)
 
     assert snapshot.metadata.indicator == "PA.NUS.GDP.PLI"
-    assert "source=2" in snapshot.metadata.source_url
+    assert "downloadformat=csv" in snapshot.metadata.source_url
     assert snapshot.countries["US"].price_level_ratio == 1.0
     assert snapshot.countries["US"].discount_fraction == 0.0
     assert snapshot.countries["IN"].price_level_ratio == 0.24
     assert snapshot.countries["IN"].discount_fraction == 0.76
 
 
-def test_build_ppp_snapshot_raises_descriptive_error_for_bad_indicator_payload(
+def test_build_ppp_snapshot_raises_descriptive_error_for_missing_indicator_rows(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    def fake_fetch_json(url: str) -> list[object]:
-        if "country?format=json" in url:
-            return [{"page": 1, "pages": 1}, [{"id": "USA", "iso2Code": "US"}]]
-        return [{"message": [{"value": "The indicator was not found."}]}]
+    bundle = build_world_bank_csv_bundle(
+        data_csv="Country Name,Country Code,Indicator Name,Indicator Code,2024\nUnited States,USA,Other,OTHER,100\n",
+        country_metadata_csv="Country Code,TableName\nUSA,United States\n",
+    )
 
-    monkeypatch.setattr(refresh_data, "fetch_json", fake_fetch_json)
+    monkeypatch.setattr(refresh_data, "fetch_binary", lambda _: bundle)
 
-    with pytest.raises(RuntimeError, match="The indicator was not found."):
+    with pytest.raises(RuntimeError, match="did not contain data rows"):
         refresh_data.build_ppp_snapshot("PA.NUS.GDP.PLI", 0.80)
 
 
-def test_fetch_json_reads_world_bank_error_payload_from_http_error(
+def test_fetch_binary_raises_runtime_error_for_http_error(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    payload = b'[{"message":[{"value":"The provided parameter value is not valid."}]}]'
-
-    def fake_urlopen(_: str):
+    def fake_urlopen(request, timeout: int):
+        assert request.headers["Accept"] == "*/*"
+        assert "DynamicPPPAPI/1.0" in request.headers["User-agent"]
+        assert timeout == 60
         raise HTTPError(
             url="https://api.worldbank.org/test",
             code=400,
             msg="Bad Request",
             hdrs=None,
-            fp=BytesIO(payload),
+            fp=BytesIO(b'{"message":"bad"}'),
         )
 
     monkeypatch.setattr(refresh_data, "urlopen", fake_urlopen)
 
-    assert refresh_data.fetch_json("https://api.worldbank.org/test") == [
-        {"message": [{"value": "The provided parameter value is not valid."}]}
-    ]
-
-
-def test_fetch_json_raises_runtime_error_for_non_json_http_error(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    def fake_urlopen(_: str):
-        raise HTTPError(
-            url="https://api.worldbank.org/test",
-            code=400,
-            msg="Bad Request",
-            hdrs=None,
-            fp=BytesIO(b"bad response"),
-        )
-
-    monkeypatch.setattr(refresh_data, "urlopen", fake_urlopen)
-
-    with pytest.raises(RuntimeError, match="HTTP 400"):
-        refresh_data.fetch_json("https://api.worldbank.org/test")
+    with pytest.raises(RuntimeError, match="Response body started with"):
+        refresh_data.fetch_binary("https://api.worldbank.org/test")
 
 
 def test_download_geoip_database_writes_binary_file(
