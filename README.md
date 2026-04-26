@@ -19,6 +19,12 @@ export IPLOCATE_API_KEY=your-api-key
 ppp-api-refresh --geoip-output ./data/ip-to-country.mmdb --ppp-output ./dynamic_ppp_api/data/ppp_snapshot.json
 ```
 
+If you only want to refresh the PPP snapshot and skip the GeoIP download:
+
+```bash
+ppp-api-refresh --skip-geoip --ppp-output ./dynamic_ppp_api/data/ppp_snapshot.json
+```
+
 4. Start the API:
 
 ```bash
@@ -193,10 +199,27 @@ If you fixed a previous failed deploy, re-run the trigger or push a new commit a
 - Keep the initial `max instances` cap at `10` until you have traffic data
 - Add a custom domain only after the base deployment is stable
 
+## Weekly PPP Refresh Automation
+
+This repo includes the GitHub Actions workflow [`weekly-ppp-refresh.yml`](/Users/nanaarkorful/Documents/Dynamic Purchasing Power Parity API/.github/workflows/weekly-ppp-refresh.yml). It runs every Monday at `13:00 UTC`, refreshes `dynamic_ppp_api/data/ppp_snapshot.json`, commits the updated snapshot back to `main`, and lets your existing Cloud Build trigger redeploy the service.
+
+The weekly workflow only refreshes the PPP snapshot. The GeoIP MMDB file is still downloaded at build time by Cloud Build, so the GitHub workflow does not need the IPLocate API key.
+
+To use the weekly refresh:
+
+1. Push the workflow file to GitHub.
+2. In GitHub, open `Settings` > `Actions` > `General`.
+3. Make sure GitHub Actions is enabled for the repository.
+4. Under workflow permissions, allow `Read and write permissions` so the workflow can commit the refreshed snapshot.
+5. If `main` is branch-protected, allow GitHub Actions to push to it or adjust the workflow to commit through a pull request instead.
+
+You can also run it manually from `GitHub` > `Actions` > `Weekly PPP Refresh` > `Run workflow`.
+
 ## Notes
 
 - The service validates both the GeoIP MMDB database and the PPP snapshot during startup.
 - The refresh command builds the iplocate download URL from `IPLOCATE_API_KEY` and `IPLOCATE_VARIANT`, or uses `IPLOCATE_DOWNLOAD_URL` if you provide a full override.
 - The bundled PPP snapshot is a starter dataset in the production schema. Run `ppp-api-refresh` before deployment to pull the latest World Bank data and replace it with a current snapshot.
+- Use `--skip-geoip` when you only want to refresh the PPP snapshot without downloading the MMDB file.
 - Cloud Build downloads the GeoIP MMDB file from IPLocate at build time using Secret Manager, so the MMDB file does not need to be committed to Git.
 - Cloud Run is configured to send traffic to container port `8000`, which matches the current Docker image.

@@ -215,6 +215,11 @@ def parse_args() -> argparse.Namespace:
         default=0.80,
         help="Maximum PPP discount fraction allowed in the generated snapshot.",
     )
+    parser.add_argument(
+        "--skip-geoip",
+        action="store_true",
+        help="Skip the GeoIP MMDB download and refresh only the PPP snapshot.",
+    )
     return parser.parse_args()
 
 
@@ -222,11 +227,12 @@ def main() -> None:
     """Refresh both the GeoIP MMDB database and the PPP snapshot in one command."""
 
     args = parse_args()
-    settings = Settings()
-    download_geoip_database(
-        download_url=resolve_iplocate_download_url(settings),
-        destination_path=args.geoip_output,
-    )
+    if not args.skip_geoip:
+        settings = Settings()
+        download_geoip_database(
+            download_url=resolve_iplocate_download_url(settings),
+            destination_path=args.geoip_output,
+        )
 
     snapshot = build_ppp_snapshot(
         indicator=args.world_bank_indicator,
@@ -236,7 +242,8 @@ def main() -> None:
         args.ppp_output,
         json.dumps(snapshot.model_dump(mode="json"), indent=2, sort_keys=True) + "\n",
     )
-    print(f"GeoIP MMDB written to {args.geoip_output.resolve()}")
+    if not args.skip_geoip:
+        print(f"GeoIP MMDB written to {args.geoip_output.resolve()}")
     print(f"PPP snapshot written to {args.ppp_output.resolve()}")
 
 

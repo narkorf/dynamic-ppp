@@ -191,7 +191,7 @@ def test_app_startup_fails_with_missing_dependencies(tmp_path: Path) -> None:
 
 
 def test_legacy_maxmind_config_alias_is_still_accepted() -> None:
-    settings = Settings(maxmind_db_path="/tmp/legacy.mmdb")
+    settings = Settings(maxmind_db_path="/tmp/legacy.mmdb", _env_file=None)
 
     assert settings.geoip_db_path == Path("/tmp/legacy.mmdb")
     assert settings.maxmind_db_path == Path("/tmp/legacy.mmdb")
@@ -244,7 +244,7 @@ def test_missing_iplocate_api_key_fails_fast(monkeypatch: pytest.MonkeyPatch) ->
     monkeypatch.delenv("IPLOCATE_DOWNLOAD_URL", raising=False)
 
     with pytest.raises(SystemExit, match="IPLOCATE_API_KEY"):
-        refresh_data.resolve_iplocate_download_url(Settings())
+        refresh_data.resolve_iplocate_download_url(Settings(_env_file=None))
 
 
 def test_download_geoip_database_rejects_html_login_response(
@@ -297,6 +297,7 @@ def test_main_prints_written_file_locations(
                 "ppp_output": ppp_output,
                 "world_bank_indicator": "PA.NUS.PPPC.RF",
                 "max_discount": 0.80,
+                "skip_geoip": False,
             },
         )(),
     )
@@ -330,4 +331,58 @@ def test_main_prints_written_file_locations(
 
     output = capsys.readouterr().out
     assert str(geoip_output.resolve()) in output
+    assert str(ppp_output.resolve()) in output
+
+
+def test_main_can_refresh_ppp_without_geoip_download(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    geoip_output = tmp_path / "ip-to-country.mmdb"
+    ppp_output = tmp_path / "ppp_snapshot.json"
+
+    monkeypatch.setattr(
+        refresh_data,
+        "parse_args",
+        lambda: type(
+            "Args",
+            (),
+            {
+                "geoip_output": geoip_output,
+                "ppp_output": ppp_output,
+                "world_bank_indicator": "PA.NUS.PPPC.RF",
+                "max_discount": 0.80,
+                "skip_geoip": True,
+            },
+        )(),
+    )
+    monkeypatch.setattr(
+        refresh_data,
+        "download_geoip_database",
+        lambda *args, **kwargs: pytest.fail("GeoIP download should be skipped."),
+    )
+    monkeypatch.setattr(
+        refresh_data,
+        "resolve_iplocate_download_url",
+        lambda settings: pytest.fail("IPLocate URL should not be resolved."),
+    )
+    monkeypatch.setattr(
+        refresh_data,
+        "build_ppp_snapshot",
+        lambda indicator, max_discount: refresh_data.PppSnapshot(
+            metadata=refresh_data.PppSnapshotMetadata(
+                source="World Development Indicators",
+                indicator=indicator,
+                source_url="https://api.worldbank.org",
+                generated_at="2026-04-05T00:00:00Z",
+                max_discount=max_discount,
+                country_count=0,
+            ),
+            countries={},
+        ),
+    )
+
+    refresh_data.main()
+
+    output = capsys.readouterr().out
+    assert str(geoip_output.resolve()) not in output
     assert str(ppp_output.resolve()) in output
