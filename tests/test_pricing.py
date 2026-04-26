@@ -204,6 +204,90 @@ def test_build_iplocate_download_url_uses_api_key_and_variant() -> None:
     assert "variant=daily" in url
 
 
+def test_extract_world_bank_records_returns_record_list() -> None:
+    payload = [{"page": 1, "pages": 1}, [{"id": "USA", "iso2Code": "US"}]]
+
+    assert refresh_data.extract_world_bank_records(
+        payload, resource_name="country lookup"
+    ) == [{"id": "USA", "iso2Code": "US"}]
+
+
+def test_extract_world_bank_records_raises_descriptive_error_for_api_message() -> None:
+    payload = [{"message": [{"value": "The indicator was not found."}]}]
+
+    with pytest.raises(RuntimeError, match="The indicator was not found."):
+        refresh_data.extract_world_bank_records(
+            payload, resource_name="indicator PA.NUS.GDP.PLI"
+        )
+
+
+def test_extract_world_bank_records_raises_for_unexpected_payload_shape() -> None:
+    with pytest.raises(RuntimeError, match="unexpected payload shape"):
+        refresh_data.extract_world_bank_records(
+            {"message": "bad"}, resource_name="country lookup"
+        )
+
+
+def test_normalize_price_level_ratio_for_gdp_price_level_index() -> None:
+    assert refresh_data.normalize_price_level_ratio("PA.NUS.GDP.PLI", 100.0) == 1.0
+    assert refresh_data.normalize_price_level_ratio("PA.NUS.GDP.PLI", 24.0) == 0.24
+
+
+def test_normalize_price_level_ratio_preserves_ratio_indicator_values() -> None:
+    assert refresh_data.normalize_price_level_ratio("PA.NUS.PPPC.RF", 0.24) == 0.24
+
+
+def test_build_country_code_lookup_raises_for_bad_world_bank_payload(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(refresh_data, "fetch_json", lambda _: [{"message": [{"value": "Broken"}]}])
+
+    with pytest.raises(RuntimeError, match="World Bank country lookup request failed"):
+        refresh_data.build_country_code_lookup()
+
+
+def test_build_ppp_snapshot_normalizes_price_level_index_values(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fake_fetch_json(url: str) -> list[object]:
+        if "country?format=json" in url:
+            return [
+                {"page": 1, "pages": 1},
+                [{"id": "USA", "iso2Code": "US"}, {"id": "IND", "iso2Code": "IN"}],
+            ]
+        return [
+            {"page": 1, "pages": 1},
+            [
+                {"countryiso3code": "USA", "value": 100.0, "date": "2024"},
+                {"countryiso3code": "IND", "value": 24.0, "date": "2024"},
+            ],
+        ]
+
+    monkeypatch.setattr(refresh_data, "fetch_json", fake_fetch_json)
+
+    snapshot = refresh_data.build_ppp_snapshot("PA.NUS.GDP.PLI", 0.80)
+
+    assert snapshot.metadata.indicator == "PA.NUS.GDP.PLI"
+    assert snapshot.countries["US"].price_level_ratio == 1.0
+    assert snapshot.countries["US"].discount_fraction == 0.0
+    assert snapshot.countries["IN"].price_level_ratio == 0.24
+    assert snapshot.countries["IN"].discount_fraction == 0.76
+
+
+def test_build_ppp_snapshot_raises_descriptive_error_for_bad_indicator_payload(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fake_fetch_json(url: str) -> list[object]:
+        if "country?format=json" in url:
+            return [{"page": 1, "pages": 1}, [{"id": "USA", "iso2Code": "US"}]]
+        return [{"message": [{"value": "The indicator was not found."}]}]
+
+    monkeypatch.setattr(refresh_data, "fetch_json", fake_fetch_json)
+
+    with pytest.raises(RuntimeError, match="The indicator was not found."):
+        refresh_data.build_ppp_snapshot("PA.NUS.GDP.PLI", 0.80)
+
+
 def test_download_geoip_database_writes_binary_file(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -295,7 +379,7 @@ def test_main_prints_written_file_locations(
             {
                 "geoip_output": geoip_output,
                 "ppp_output": ppp_output,
-                "world_bank_indicator": "PA.NUS.PPPC.RF",
+                "world_bank_indicator": "PA.NUS.GDP.PLI",
                 "max_discount": 0.80,
                 "skip_geoip": False,
             },
@@ -349,7 +433,7 @@ def test_main_can_refresh_ppp_without_geoip_download(
             {
                 "geoip_output": geoip_output,
                 "ppp_output": ppp_output,
-                "world_bank_indicator": "PA.NUS.PPPC.RF",
+                "world_bank_indicator": "PA.NUS.GDP.PLI",
                 "max_discount": 0.80,
                 "skip_geoip": True,
             },

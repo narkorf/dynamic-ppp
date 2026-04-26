@@ -22,6 +22,7 @@ WORLD_BANK_INDICATOR_URL = (
     "https://api.worldbank.org/v2/country/all/indicator/{indicator}"
     "?format=json&mrnev=1&per_page=20000"
 )
+DEFAULT_WORLD_BANK_INDICATOR = "PA.NUS.GDP.PLI"
 IPLOCATE_DOWNLOAD_URL = (
     "https://www.iplocate.io/download/ip-to-country.mmdb"
     "?apikey={api_key}&variant={variant}"
@@ -33,6 +34,42 @@ def fetch_json(url: str) -> list[object]:
 
     with urlopen(url) as response:  # noqa: S310 - explicit trusted sources only
         return json.load(response)
+
+
+def extract_world_bank_records(payload: object, *, resource_name: str) -> list[dict[str, object]]:
+    """Validate a World Bank JSON payload and return its records."""
+
+    if (
+        isinstance(payload, list)
+        and len(payload) >= 2
+        and isinstance(payload[1], list)
+    ):
+        return payload[1]
+
+    if isinstance(payload, list) and payload:
+        error_block = payload[0]
+        if isinstance(error_block, dict):
+            message_items = error_block.get("message")
+            if isinstance(message_items, list) and message_items:
+                first_message = message_items[0]
+                if isinstance(first_message, dict):
+                    value = first_message.get("value")
+                    if isinstance(value, str) and value:
+                        raise RuntimeError(
+                            f"World Bank {resource_name} request failed: {value}"
+                        )
+
+    raise RuntimeError(
+        f"World Bank {resource_name} request returned an unexpected payload shape."
+    )
+
+
+def normalize_price_level_ratio(indicator: str, value: float) -> float:
+    """Normalize World Bank indicator values into the ratio scale used by pricing."""
+
+    if indicator == DEFAULT_WORLD_BANK_INDICATOR:
+        return value / 100.0
+    return value
 
 
 def atomic_write_text(path: Path, contents: str) -> None:
@@ -61,7 +98,7 @@ def build_country_code_lookup() -> dict[str, str]:
     """Build an ISO3 -> ISO2 lookup table from the World Bank country endpoint."""
 
     payload = fetch_json(WORLD_BANK_COUNTRIES_URL)
-    countries = payload[1]
+    countries = extract_world_bank_records(payload, resource_name="country lookup")
     lookup: dict[str, str] = {}
     for country in countries:
         iso2_code = country.get("iso2Code")
@@ -76,7 +113,7 @@ def build_ppp_snapshot(indicator: str, max_discount: float) -> PppSnapshot:
 
     country_lookup = build_country_code_lookup()
     payload = fetch_json(WORLD_BANK_INDICATOR_URL.format(indicator=quote(indicator)))
-    records = payload[1]
+    records = extract_world_bank_records(payload, resource_name=f"indicator {indicator}")
 
     country_records: dict[str, PppCountryRecord] = {}
     for row in records:
@@ -86,7 +123,7 @@ def build_ppp_snapshot(indicator: str, max_discount: float) -> PppSnapshot:
             continue
 
         country_code = country_lookup[iso3_code]
-        price_level_ratio = float(value)
+        price_level_ratio = normalize_price_level_ratio(indicator, float(value))
         discount_fraction = derive_discount_from_price_level_ratio(
             price_level_ratio=price_level_ratio,
             max_discount=max_discount,
@@ -206,7 +243,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--world-bank-indicator",
-        default="PA.NUS.PPPC.RF",
+        default=DEFAULT_WORLD_BANK_INDICATOR,
         help="World Bank indicator used to derive the PPP snapshot.",
     )
     parser.add_argument(
