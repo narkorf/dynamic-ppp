@@ -1118,9 +1118,9 @@
     },
     "TV": {
       "country_code": "TV",
-      "discount_fraction": 0.12873349003907097,
-      "price_level_ratio": 0.871266509960929,
-      "source_year": 2023
+      "discount_fraction": 0.1061992386886711,
+      "price_level_ratio": 0.8938007613113289,
+      "source_year": 2025
     },
     "TZ": {
       "country_code": "TZ",
@@ -1221,7 +1221,7 @@
   },
   "metadata": {
     "country_count": 203,
-    "generated_at": "2026-07-13T15:43:07.843575Z",
+    "generated_at": "2026-07-27T15:42:14.744420Z",
     "indicator": "PA.NUS.GDP.PLI",
     "max_discount": 0.8,
     "source": "World Development Indicators",
