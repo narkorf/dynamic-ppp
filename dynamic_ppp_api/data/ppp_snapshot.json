@@ -686,8 +686,8 @@
     },
     "ME": {
       "country_code": "ME",
-      "discount_fraction": 0.581712826997601,
-      "price_level_ratio": 0.41828717300239904,
+      "discount_fraction": 0.5827383561077071,
+      "price_level_ratio": 0.417261643892293,
       "source_year": 2025
     },
     "MG": {
@@ -1221,7 +1221,7 @@
   },
   "metadata": {
     "country_count": 203,
-    "generated_at": "2026-09-28T20:00:53.721174Z",
+    "generated_at": "2026-10-12T21:35:15.397788Z",
     "indicator": "PA.NUS.GDP.PLI",
     "max_discount": 0.8,
     "source": "World Development Indicators",
